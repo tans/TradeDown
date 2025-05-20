@@ -1,52 +1,105 @@
-# TradeDown
-Text-Based Crypto Trading Language
+# TradeDown Syntax Parser — Usage Guide
+
+## Overview
+
+`TradeDown.ts` provides a lightweight, human-friendly syntax for parsing common blockchain trading actions like **buy**, **sell**, and **query**, all in one line of text.
+
+## Features
+
+* 🔍 Simple one-line trade expressions
+* ⚡ Auto-detects EVM or Solana addresses
+* 🌐 Multi-chain support with default to `bsc`
+* 🧠 Intuitive operators: `+` for buy, `-` for sell
+* 📝 Optional units (`bnb`, `eth`, `sol`, or `%`)
+
+---
+
+## Supported Formats
+
+### 1. Buy Command
+
+```txt
+0x... + 0.5bnb
+```
+
+**Effect:** Buy 0.5 BNB worth of the token at `0x...` on BSC (or inferred chain).
+
+### 2. Sell Command
+
+```txt
+0x... - 100%
+```
+
+**Effect:** Sell 100% of the token held at `0x...`.
+
+### 3. Query Command
+
+```txt
+0x...
+```
+
+**Effect:** Query the token information at this address.
+
+### 4. Solana Format
+
+```txt
+3n65... + 1.2sol
+```
+
+**Effect:** Buy 1.2 SOL worth of this SPL token on Solana.
+
+---
+
+## Syntax Reference
 
 ```
-# TradeDown 语法介绍
-
-## 基本格式
- 
-
 <address> [+|-] <value>[%] [unit]
 ```
 
-## 各部分说明
+* `<address>`: EVM (0x...) or Solana (base58)
+* `+`: Buy command
+* `-`: Sell command
+* `%`: Optional. Interprets `value` as a percentage.
+* `[unit]`: Optional. Default is:
 
-* `<address>`：
+  * `bnb` for buy
+  * `token` for sell
 
-  * EVM 地址，40位十六进制，前缀 `0x`（如 `0x0980...`）
-  * Solana 地址，32\~44位 Base58 编码（如 `3n65MaYLVdu8Dfi63Zrm25KCNt4WyLPVWwNT5Ch9S93W`）
+---
 
-* `+` ：买入操作符，表示买入指定数量的代币。
+## Examples
 
-* `-` ：卖出操作符，表示卖出指定数量或百分比的代币。
+| Input            | Output Description          |
+| ---------------- | --------------------------- |
+| `0xABC...+1bnb`  | Buy 1 BNB worth of token    |
+| `0xABC...-50%`   | Sell 50% of token holdings  |
+| `0xABC...`       | Query token info            |
+| `9wFF...+2.3sol` | Buy 2.3 SOL worth on Solana |
 
-* `<value>`：
+---
 
-  * 数值，支持整数或小数（如 `0.5`、`100`）。
-  * 代表买入/卖出的数量或百分比。
+## Error Codes
 
-* `%`（可选）：
+| Code              | Description                   |
+| ----------------- | ----------------------------- |
+| `INVALID_FORMAT`  | Does not match syntax pattern |
+| `INVALID_ADDRESS` | Address not EVM/Solana valid  |
+| `INVALID_VALUE`   | Value is not a valid number   |
 
-  * 表示 `<value>` 是百分比（如 `100%` 表示全部卖出）。
+---
 
-* `[unit]`（可选）：
+## Run Instructions
 
-  * 代币单位，如 `bnb`、`sol`、`token` 等。
-  * 默认买入时单位为 `bnb`，卖出时单位为 `token`。
+```bash
+# Compile
+$ tsc TradeDown.ts
 
-## 查询语法
+# Run Example
+$ node TradeDown.js
+```
 
-仅填写 `<address>` 即可，表示查询该地址的代币信息。
+---
 
-## 示例
+## Customization
 
-* `0x098054c0c6ba84d95E2011946Db9a15BfFDB4444+0.5bnb`
-  买入 0.5 个 BNB 的代币。
-
-* `0x098054c0c6ba84d95E2011946Db9a15BfFDB4444-100%`
-  卖出该地址持有的全部代币。
-
-* `3n65MaYLVdu8Dfi63Zrm25KCNt4WyLPVWwNT5Ch9S93W`
-  查询 Solana 地址对应的代币信息。
-
+Extend `detectChain()` to support additional blockchains such as Ethereum (`eth`), Polygon (`matic`), etc.
